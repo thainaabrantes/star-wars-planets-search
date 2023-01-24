@@ -1,6 +1,9 @@
-import PropTypes from 'prop-types';
+import React, { useContext } from 'react';
+import PlanetsContext from '../context/PlanetsContext';
 
-function Table({ planets }) {
+function Table() {
+  const { list } = useContext(PlanetsContext);
+
   return (
     <div>
       <table>
@@ -22,7 +25,7 @@ function Table({ planets }) {
           </tr>
         </thead>
         <tbody>
-          {planets.map((planet, index) => (
+          {list.map((planet, index) => (
             <tr key={ index }>
               <td>{ planet.name }</td>
               <td>{ planet.rotation_period }</td>
@@ -44,9 +47,5 @@ function Table({ planets }) {
     </div>
   );
 }
-
-Table.propTypes = {
-  planets: PropTypes.instanceOf(Array).isRequired,
-};
 
 export default Table;
