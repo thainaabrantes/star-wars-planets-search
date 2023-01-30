@@ -6,7 +6,7 @@ export default function NumericFilter() {
     columnFilterValues,
     valueFilter,
     handleChangeNumericFilter,
-    filterPlanetsByColumn,
+    setColumnValuesToFilter,
   } = useContext(PlanetsContext);
 
   return (
@@ -40,7 +40,7 @@ export default function NumericFilter() {
       />
       <button
         data-testid="button-filter"
-        onClick={ filterPlanetsByColumn }
+        onClick={ setColumnValuesToFilter }
       >
         Filtrar
       </button>

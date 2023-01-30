@@ -38,7 +38,7 @@ export default function PlanetsProvider({ children }) {
     if (target.name === 'valueFilter') setValueFilter(target.value);
   };
 
-  const filterPlanetsByColumnTest = () => {
+  const implementNumericFilter = () => {
     const filteredPlanetsByColumn = planets.filter((planet) => {
       if (comparisonFilterSelected === 'maior que') {
         return (Number(planet[columnFilterSelected]) > valueFilter);
@@ -57,10 +57,10 @@ export default function PlanetsProvider({ children }) {
   };
 
   useEffect(() => {
-    filterPlanetsByColumnTest();
+    implementNumericFilter();
   }, [columnFilterValues]);
 
-  const filterPlanetsByColumn = () => {
+  const setColumnValuesToFilter = () => {
     setColumnFilterValues(columnFilterValues
       .filter((value) => value !== columnFilterSelected));
   };
@@ -74,7 +74,7 @@ export default function PlanetsProvider({ children }) {
         columnFilterValues,
         valueFilter,
         handleChangeNumericFilter,
-        filterPlanetsByColumn,
+        setColumnValuesToFilter,
       } }
     >
       { children }
