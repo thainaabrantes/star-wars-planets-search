@@ -3,6 +3,7 @@ import PlanetsContext from '../context/PlanetsContext';
 
 export default function NumericFilter() {
   const {
+    columnFilterValues,
     valueFilter,
     handleChangeNumericFilter,
     filterPlanetsByColumn,
@@ -15,11 +16,11 @@ export default function NumericFilter() {
         name="columnFilter"
         onChange={ handleChangeNumericFilter }
       >
-        <option value="population">population</option>
-        <option value="orbital_period">orbital_period</option>
-        <option value="diameter">diameter</option>
-        <option value="rotation_period">rotation_period</option>
-        <option value="surface_water">surface_water</option>
+        {
+          columnFilterValues.map((value, i) => (
+            <option key={ i } value={ value }>{ value }</option>
+          ))
+        }
       </select>
       <select
         data-testid="comparison-filter"

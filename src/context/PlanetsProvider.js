@@ -5,9 +5,17 @@ import PlanetsContext from './PlanetsContext';
 export default function PlanetsProvider({ children }) {
   const [planets, setPlanets] = useState([]);
   const [searchName, setSearchName] = useState('');
-  const [columnFilter, setColumnFilter] = useState('population');
-  const [comparisonFilter, setComparisonFilter] = useState('maior que');
+  const [columnFilterValues, setColumnFilterValues] = useState([
+    'population',
+    'orbital_period',
+    'diameter',
+    'rotation_period',
+    'surface_water',
+  ]);
+  const [columnFilterSelected, setColumnFilterSelected] = useState('population');
+  const [comparisonFilterSelected, setComparisonFilterSelected] = useState('maior que');
   const [valueFilter, setValueFilter] = useState(0);
+  // const [filterByNumericValues, setFilterByNumericValues] = useState([]);
 
   useEffect(() => {
     fetch('https://swapi.dev/api/planets')
@@ -24,39 +32,46 @@ export default function PlanetsProvider({ children }) {
     setSearchName(target.value);
   };
 
-  const filteredPlanets = planets.filter((planet) => planet.name.toLocaleLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/gi, '')
-    .includes(searchName.toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/gi, '')));
-
   const handleChangeNumericFilter = ({ target }) => {
-    if (target.name === 'columnFilter') setColumnFilter(target.value);
-    if (target.name === 'comparisonFilter') setComparisonFilter(target.value);
+    if (target.name === 'columnFilter') setColumnFilterSelected(target.value);
+    if (target.name === 'comparisonFilter') setComparisonFilterSelected(target.value);
     if (target.name === 'valueFilter') setValueFilter(target.value);
   };
 
-  const filterPlanetsByColumn = () => {
-    const filteredPlanetsByColumn = filteredPlanets.filter((planet) => {
-      if (comparisonFilter === 'maior que') {
-        return (Number(planet[columnFilter]) > valueFilter);
+  const filterPlanetsByColumnTest = () => {
+    const filteredPlanetsByColumn = planets.filter((planet) => {
+      if (comparisonFilterSelected === 'maior que') {
+        return (Number(planet[columnFilterSelected]) > valueFilter);
       }
-      if (comparisonFilter === 'menor que') {
-        return (Number(planet[columnFilter]) < valueFilter);
+      if (comparisonFilterSelected === 'menor que') {
+        return (Number(planet[columnFilterSelected]) < valueFilter);
       }
-      if (comparisonFilter === 'igual a') {
-        return (planet[columnFilter] === valueFilter);
+      if (comparisonFilterSelected === 'igual a') {
+        return (planet[columnFilterSelected] === valueFilter);
       }
       return true;
     });
-    console.log(filteredPlanetsByColumn);
+
     setPlanets(filteredPlanetsByColumn);
+    setColumnFilterSelected(columnFilterValues[0]);
+  };
+
+  useEffect(() => {
+    filterPlanetsByColumnTest();
+  }, [columnFilterValues]);
+
+  const filterPlanetsByColumn = () => {
+    setColumnFilterValues(columnFilterValues
+      .filter((value) => value !== columnFilterSelected));
   };
 
   return (
     <PlanetsContext.Provider
       value={ {
-        filteredPlanets,
+        planets,
         searchName,
         handleChangeSearch,
+        columnFilterValues,
         valueFilter,
         handleChangeNumericFilter,
         filterPlanetsByColumn,
