@@ -1,14 +1,13 @@
 import React from 'react';
 import Table from './components/Table';
+import NumericFilter from './components/NumericFilter';
 import PlanetsProvider from './context/PlanetsProvider';
-import NameFilterProvider from './context/NameFilterProvider';
 
 function App() {
   return (
     <PlanetsProvider>
-      <NameFilterProvider>
-        <Table />
-      </NameFilterProvider>
+      <NumericFilter />
+      <Table />
     </PlanetsProvider>
   );
 }
