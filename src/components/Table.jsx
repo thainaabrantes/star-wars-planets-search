@@ -1,9 +1,14 @@
 import { BsTrash } from 'react-icons/bs';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import PlanetsContext from '../context/PlanetsContext';
 
 function Table() {
-  const { planets, searchName, handleChangeSearch, filterByNumericValues, removeFilter } = useContext(PlanetsContext);
+  const {
+    planets,
+    searchName,
+    handleChangeSearch,
+    filterByNumericValues,
+    removeFilter } = useContext(PlanetsContext);
 
   return (
     <div>
@@ -24,7 +29,10 @@ function Table() {
           filterByNumericValues.map((filter, i) => (
             <div key={ i } data-testid="filter">
               <p>{ `${filter.column} ${filter.comparison} ${filter.value}` }</p>
-              <BsTrash data-testid="button-remove-filters" onClick={ () => removeFilter(filter) } />
+              <BsTrash
+                data-testid="button-remove-filters"
+                onClick={ () => removeFilter(filter) }
+              />
             </div>
           ))
         }
