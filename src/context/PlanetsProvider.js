@@ -15,7 +15,7 @@ export default function PlanetsProvider({ children }) {
   const [columnFilterSelected, setColumnFilterSelected] = useState('population');
   const [comparisonFilterSelected, setComparisonFilterSelected] = useState('maior que');
   const [valueFilter, setValueFilter] = useState(0);
-  // const [filterByNumericValues, setFilterByNumericValues] = useState([]);
+  const [filterByNumericValues, setFilterByNumericValues] = useState([]);
 
   useEffect(() => {
     fetch('https://swapi.dev/api/planets')
@@ -61,8 +61,22 @@ export default function PlanetsProvider({ children }) {
   }, [columnFilterValues]);
 
   const setColumnValuesToFilter = () => {
+    setFilterByNumericValues([...filterByNumericValues, {
+      column: columnFilterSelected,
+      comparison: comparisonFilterSelected,
+      value: valueFilter.toString(),
+    }]);
+
     setColumnFilterValues(columnFilterValues
       .filter((value) => value !== columnFilterSelected));
+  };
+
+  const removeFilter = (filterParam) => {
+    setFilterByNumericValues(filterByNumericValues
+      .filter((item) => item.column !== filterParam));
+
+    setColumnFilterValues([...columnFilterValues, filterParam.column]);
+    // console.log(filterByNumericValues);
   };
 
   return (
@@ -75,6 +89,8 @@ export default function PlanetsProvider({ children }) {
         valueFilter,
         handleChangeNumericFilter,
         setColumnValuesToFilter,
+        filterByNumericValues,
+        removeFilter,
       } }
     >
       { children }

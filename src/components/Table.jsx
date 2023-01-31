@@ -1,8 +1,9 @@
-import React, { useContext } from 'react';
+import { BsTrash } from 'react-icons/bs';
+import React, { useContext, useEffect } from 'react';
 import PlanetsContext from '../context/PlanetsContext';
 
 function Table() {
-  const { planets, searchName, handleChangeSearch } = useContext(PlanetsContext);
+  const { planets, searchName, handleChangeSearch, filterByNumericValues, removeFilter } = useContext(PlanetsContext);
 
   return (
     <div>
@@ -17,6 +18,16 @@ function Table() {
             onChange={ handleChangeSearch }
           />
         </label>
+      </div>
+      <div className="numeric-filters">
+        {
+          filterByNumericValues.map((filter, i) => (
+            <div key={ i } data-testid="filter">
+              <p>{ `${filter.column} ${filter.comparison} ${filter.value}` }</p>
+              <BsTrash data-testid="button-remove-filters" onClick={ () => removeFilter(filter) } />
+            </div>
+          ))
+        }
       </div>
       <table>
         <thead>
@@ -42,7 +53,7 @@ function Table() {
             .includes(searchName.toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/gi, '')))
             .map((planet, index) => (
               <tr key={ index }>
-                <td>{ planet.name }</td>
+                <td data-testid="planet-name">{ planet.name }</td>
                 <td>{ planet.rotation_period }</td>
                 <td>{ planet.orbital_period }</td>
                 <td>{ planet.diameter }</td>
