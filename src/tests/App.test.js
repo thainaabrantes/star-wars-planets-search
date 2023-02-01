@@ -9,6 +9,9 @@ beforeEach(async () => {
   jest.spyOn(global, 'fetch').mockImplementationOnce(() => Promise.resolve({
     json: () => Promise.resolve(planetsData)
   }));
+  // global.fetch = jest.fn().mockResolvedValue({
+  //   json: jest.fn().mockResolvedValue(planetsData)
+  // })
 });
 afterEach(() => {
   jest.resetAllMocks();
@@ -68,50 +71,64 @@ describe('Testa da StarWars planets search', () => {
   });
   test('Testa o filtro numerico "igual a"', async () => {
     render(<App />);
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+    let planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(10);
+
     const selectColumn = screen.getByTestId('column-filter');
+    const rotationPeriod = screen.getByRole('option', {name: /rotation_period/i});
+
     const selectComparision = screen.getByTestId('comparison-filter');
+    const igualA = screen.getByRole('option', {name: /igual a/i});
+
     const inputValue = screen.getByTestId('value-filter');
 
-    userEvent.selectOptions(selectColumn, 'rotation_period');
-    userEvent.selectOptions(selectComparision, 'igual a');
+    userEvent.selectOptions(selectColumn, rotationPeriod);
+    userEvent.selectOptions(selectComparision, igualA);
+
+    userEvent.clear(inputValue);
     userEvent.type(inputValue, '23');
 
     const filterButton = screen.getByTestId('button-filter');
     userEvent.click(filterButton);
 
-    const tatooine = await screen.findByRole('cell', {  name: /tatooine/i});
-    const hoth = await screen.findByRole('cell', {  name: /hoth/i});
-    const dagobah = await screen.findByRole('cell', {  name: /dagobah/i});
-    expect(tatooine && hoth && dagobah).toBeInTheDocument();
+    planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(3);
   });
   test('Testa o filtro numerico "maior que"', async () => {
     render(<App />);
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1))
+    let planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(10);
 
-    userEvent.selectOptions(screen.getByTestId('column-filter'), 'rotation_period');
-    userEvent.selectOptions(screen.getByTestId('comparison-filter'), 'maior que');
+    userEvent.selectOptions(screen.getByTestId('column-filter'), screen.getByRole('option', {name: /rotation_period/i}));
+    userEvent.selectOptions(screen.getByTestId('comparison-filter'), screen.getByRole('option', {name: /maior que/i}));
+
+    userEvent.clear(screen.getByTestId('value-filter'));
     userEvent.type(screen.getByTestId('value-filter'), '25');
 
     userEvent.click(screen.getByTestId('button-filter'));
 
-    const naboo = await screen.findByRole('cell', {  name: /naboo/i});
-    const kamino = await screen.findByRole('cell', {  name: /kamino/i});
-    expect(naboo && kamino).toBeInTheDocument();
+    planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(2);
   });
   test('Testa o filtro numerico "menor que"', async () => {
     render(<App />);
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
 
-    userEvent.selectOptions(screen.getByTestId('column-filter'), 'rotation_period');
-    userEvent.selectOptions(screen.getByTestId('comparison-filter'), 'menor que');
+    let planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(10);
+
+    userEvent.selectOptions(screen.getByTestId('column-filter'), screen.getByRole('option', {name: /rotation_period/i}));
+    userEvent.selectOptions(screen.getByTestId('comparison-filter'), screen.getByRole('option', {name: /menor que/i}));
+
+    userEvent.clear(screen.getByTestId('value-filter'));
     userEvent.type(screen.getByTestId('value-filter'), '23');
 
     userEvent.click(screen.getByTestId('button-filter'));
 
-    const bespin = await screen.findByRole('cell', {  name: /bespin/i});
-    const endor = await screen.findByRole('cell', {  name: /endor/i});
-    expect(bespin && endor).toBeInTheDocument();
+    planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(2);
   });
   test('Se o botão search filtra os nomes pesquisados', async () => {
     render(<App />);
