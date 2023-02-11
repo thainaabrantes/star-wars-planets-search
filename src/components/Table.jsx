@@ -4,7 +4,7 @@ import PlanetsContext from '../context/PlanetsContext';
 
 function Table() {
   const {
-    planets,
+    planetsToRender,
     searchName,
     handleChangeSearch,
     filterByNumericValues,
@@ -56,7 +56,7 @@ function Table() {
           </tr>
         </thead>
         <tbody>
-          {planets.filter((planetFil) => planetFil.name.toLocaleLowerCase()
+          {planetsToRender.filter((planetFil) => planetFil.name.toLocaleLowerCase()
             .normalize('NFD').replace(/[\u0300-\u036f]/gi, '')
             .includes(searchName.toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/gi, '')))
             .map((planet, index) => (

@@ -4,6 +4,7 @@ import PlanetsContext from './PlanetsContext';
 
 export default function PlanetsProvider({ children }) {
   const [planets, setPlanets] = useState([]);
+  const [planetsToRender, setPlanetsToRender] = useState([]);
   const [searchName, setSearchName] = useState('');
   const [columnFilterValues, setColumnFilterValues] = useState([
     'population',
@@ -28,6 +29,10 @@ export default function PlanetsProvider({ children }) {
       });
   }, []);
 
+  useEffect(() => {
+    setPlanetsToRender(planets);
+  }, [planets]);
+
   const handleChangeSearch = ({ target }) => {
     setSearchName(target.value);
   };
@@ -38,21 +43,29 @@ export default function PlanetsProvider({ children }) {
     if (target.name === 'valueFilter') setValueFilter(target.value);
   };
 
-  const implementNumericFilter = () => {
-    const filteredPlanetsByColumn = planets.filter((planet) => {
-      if (comparisonFilterSelected === 'maior que') {
-        return (Number(planet[columnFilterSelected]) > valueFilter);
-      }
-      if (comparisonFilterSelected === 'menor que') {
-        return (Number(planet[columnFilterSelected]) < valueFilter);
-      }
-      if (comparisonFilterSelected === 'igual a') {
-        return (planet[columnFilterSelected] === valueFilter);
-      }
-      return true;
-    });
+  const filterNumerically = (planet, columnFilter, comparisonFilter, value) => {
+    if (comparisonFilter === 'maior que') {
+      return (Number(planet[columnFilter]) > value);
+    }
+    if (comparisonFilter === 'menor que') {
+      return (Number(planet[columnFilter]) < value);
+    }
+    if (comparisonFilter === 'igual a') {
+      return (planet[columnFilter] === value);
+    }
+    return true;
+  };
 
-    setPlanets(filteredPlanetsByColumn);
+  const implementNumericFilter = () => {
+    const filteredPlanetsByColumn = planetsToRender
+      .filter((planet) => filterNumerically(
+        planet,
+        columnFilterSelected,
+        comparisonFilterSelected,
+        valueFilter,
+      ));
+
+    setPlanetsToRender(filteredPlanetsByColumn);
     setColumnFilterSelected(columnFilterValues[0]);
   };
 
@@ -73,16 +86,38 @@ export default function PlanetsProvider({ children }) {
 
   const removeFilter = (filterParam) => {
     setFilterByNumericValues(filterByNumericValues
-      .filter((item) => item.column !== filterParam));
+      .filter((filter) => filter.column !== filterParam.column));
 
-    setColumnFilterValues([...columnFilterValues, filterParam.column]);
-    // console.log(filterByNumericValues);
+    setColumnFilterValues([...columnFilterValues, filterParam]);
+
+    const planetsAfterRemoveFilter = [];
+    filterByNumericValues.forEach((filter, index) => {
+      const filteredPlanets = planets.filter((planet) => filterNumerically(
+        planet,
+        filter.column,
+        filter.comparison,
+        filter.value,
+      ));
+      console.log(filteredPlanets);
+      console.log(filter.column, filter.comparison, filter.value);
+
+      if (index > 0) {
+        planetsAfterRemoveFilter.forEach((planet) => {
+          const newPlanetsToRender = filteredPlanets
+            .filter((pl) => pl.name !== planet.name);
+          planetsAfterRemoveFilter.push(newPlanetsToRender);
+        });
+      }
+      planetsAfterRemoveFilter.push(filteredPlanets);
+    });
+    setPlanetsToRender(planetsAfterRemoveFilter);
+    console.log(planetsAfterRemoveFilter);
   };
 
   return (
     <PlanetsContext.Provider
       value={ {
-        planets,
+        planetsToRender,
         searchName,
         handleChangeSearch,
         columnFilterValues,
