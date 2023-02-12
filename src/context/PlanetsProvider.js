@@ -85,30 +85,21 @@ export default function PlanetsProvider({ children }) {
   };
 
   const removeFilter = (filterParam) => {
-    setFilterByNumericValues(filterByNumericValues
-      .filter((filter) => filter.column !== filterParam.column));
+    const columnFiltersAfterRemoval = filterByNumericValues
+      .filter((filter) => filter.column !== filterParam.column);
 
-    setColumnFilterValues([...columnFilterValues, filterParam]);
+    setFilterByNumericValues(columnFiltersAfterRemoval);
 
-    const planetsAfterRemoveFilter = [];
-    filterByNumericValues.forEach((filter, index) => {
-      const filteredPlanets = planets.filter((planet) => filterNumerically(
+    setColumnFilterValues([...columnFilterValues, filterParam.column]);
+
+    let planetsAfterRemoveFilter = [];
+    filterByNumericValues.forEach((filter) => {
+      planetsAfterRemoveFilter = planets.filter((planet) => filterNumerically(
         planet,
         filter.column,
         filter.comparison,
         filter.value,
       ));
-      console.log(filteredPlanets);
-      console.log(filter.column, filter.comparison, filter.value);
-
-      if (index > 0) {
-        planetsAfterRemoveFilter.forEach((planet) => {
-          const newPlanetsToRender = filteredPlanets
-            .filter((pl) => pl.name !== planet.name);
-          planetsAfterRemoveFilter.push(newPlanetsToRender);
-        });
-      }
-      planetsAfterRemoveFilter.push(filteredPlanets);
     });
     setPlanetsToRender(planetsAfterRemoveFilter);
     console.log(planetsAfterRemoveFilter);
