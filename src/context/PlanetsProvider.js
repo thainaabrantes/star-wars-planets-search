@@ -17,6 +17,7 @@ export default function PlanetsProvider({ children }) {
   const [comparisonFilterSelected, setComparisonFilterSelected] = useState('maior que');
   const [valueFilter, setValueFilter] = useState(0);
   const [filterByNumericValues, setFilterByNumericValues] = useState([]);
+  const [removeFilterClicked, setRemoveFilterclicked] = useState(false);
 
   useEffect(() => {
     fetch('https://swapi.dev/api/planets')
@@ -92,17 +93,40 @@ export default function PlanetsProvider({ children }) {
 
     setColumnFilterValues([...columnFilterValues, filterParam.column]);
 
-    let planetsAfterRemoveFilter = [];
-    filterByNumericValues.forEach((filter) => {
-      planetsAfterRemoveFilter = planets.filter((planet) => filterNumerically(
-        planet,
-        filter.column,
-        filter.comparison,
-        filter.value,
-      ));
-    });
-    setPlanetsToRender(planetsAfterRemoveFilter);
-    console.log(planetsAfterRemoveFilter);
+    setRemoveFilterclicked(true);
+  };
+
+  const renderPlanetsAfterRemoveFilter = () => {
+    if (filterByNumericValues.length > 0) {
+      const planetsAfterRemoveFilter = [];
+
+      filterByNumericValues.forEach((filter) => {
+        const planetsWithEachFilter = planets.filter((planet) => filterNumerically(
+          planet,
+          filter.column,
+          filter.comparison,
+          filter.value,
+        ));
+        planetsAfterRemoveFilter.push(...planetsWithEachFilter);
+      });
+
+      const newPlanetsToRender = planetsAfterRemoveFilter
+        .filter((p, index, array) => array.indexOf(p) === index);
+
+      setPlanetsToRender(newPlanetsToRender);
+    } else {
+      setPlanetsToRender(planets);
+    }
+  };
+
+  useEffect(() => {
+    renderPlanetsAfterRemoveFilter();
+    setRemoveFilterclicked(false);
+  }, [removeFilterClicked]);
+
+  const removeAllFilters = () => {
+    setFilterByNumericValues([]);
+    setPlanetsToRender(planets);
   };
 
   return (
@@ -117,6 +141,7 @@ export default function PlanetsProvider({ children }) {
         setColumnValuesToFilter,
         filterByNumericValues,
         removeFilter,
+        removeAllFilters,
       } }
     >
       { children }
