@@ -38,6 +38,7 @@ function Table() {
             <div key={ i } data-testid="filter">
               <p>{ `${filter.column} ${filter.comparison} ${filter.value}` }</p>
               <button
+                data-testid="button-remove-filter"
                 onClick={ () => removeFilter(filter) }
               >
                 remover filtro

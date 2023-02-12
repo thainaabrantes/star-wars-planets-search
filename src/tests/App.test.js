@@ -144,4 +144,111 @@ describe('Testa da StarWars planets search', () => {
     const naboo = await screen.findByRole('cell', {name: /naboo/i});
     expect(tatooine && naboo).toBeInTheDocument();
   });
+  test('Se o filtro é removido ao clicar no botão de remover filtro', async () => {
+    render(<App />);
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+
+    let planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(10);
+    
+    userEvent.selectOptions(screen.getByTestId('column-filter'), screen.getByRole('option', {name: /orbital_period/i}));
+    userEvent.selectOptions(screen.getByTestId('comparison-filter'), screen.getByRole('option', {name: /menor que/i}));
+
+    userEvent.clear(screen.getByTestId('value-filter'));
+    userEvent.type(screen.getByTestId('value-filter'), '400');
+
+    userEvent.click(screen.getByTestId('button-filter'));
+
+    planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(5);
+
+    expect(await screen.findByText(/orbital_period menor que 400/i)).toBeInTheDocument();
+
+    userEvent.click(await screen.findByTestId('button-remove-filter'));
+
+    planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(10);
+  });
+  test('Se todos os filtros são removidos ao clicar no botão de remover filtros', async () => {
+    render(<App />);
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+
+    let planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(10);
+    
+    userEvent.selectOptions(screen.getByTestId('column-filter'), screen.getByRole('option', {name: /orbital_period/i}));
+    userEvent.selectOptions(screen.getByTestId('comparison-filter'), screen.getByRole('option', {name: /menor que/i}));
+
+    userEvent.clear(screen.getByTestId('value-filter'));
+    userEvent.type(screen.getByTestId('value-filter'), '400');
+
+    userEvent.click(screen.getByTestId('button-filter'));
+
+    expect(await screen.findByText(/orbital_period menor que 400/i)).toBeInTheDocument();
+
+    planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(5);
+
+    userEvent.selectOptions(screen.getByTestId('column-filter'), screen.getByRole('option', {name: /rotation_period/i}));
+    userEvent.selectOptions(screen.getByTestId('comparison-filter'), screen.getByRole('option', {name: /igual a/i}));
+
+    userEvent.clear(screen.getByTestId('value-filter'));
+    userEvent.type(screen.getByTestId('value-filter'), '24');
+
+    userEvent.click(screen.getByTestId('button-filter'));
+
+    expect(await screen.findByText(/rotation_period igual a 24/i)).toBeInTheDocument();
+
+    planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(2);
+
+    userEvent.click(await screen.findByTestId('button-remove-filters'));
+
+    planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(10);
+  });
+  test('Se todos os planetas são renderizados ao excluir todos os filtros por vez', async () => {
+    render(<App />);
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+
+    let planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(10);
+    
+    userEvent.selectOptions(screen.getByTestId('column-filter'), screen.getByRole('option', {name: /orbital_period/i}));
+    userEvent.selectOptions(screen.getByTestId('comparison-filter'), screen.getByRole('option', {name: /menor que/i}));
+
+    userEvent.clear(screen.getByTestId('value-filter'));
+    userEvent.type(screen.getByTestId('value-filter'), '400');
+
+    userEvent.click(screen.getByTestId('button-filter'));
+
+    expect(await screen.findByText(/orbital_period menor que 400/i)).toBeInTheDocument();
+
+    planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(5);
+
+    userEvent.selectOptions(screen.getByTestId('column-filter'), screen.getByRole('option', {name: /rotation_period/i}));
+    userEvent.selectOptions(screen.getByTestId('comparison-filter'), screen.getByRole('option', {name: /igual a/i}));
+
+    userEvent.clear(screen.getByTestId('value-filter'));
+    userEvent.type(screen.getByTestId('value-filter'), '24');
+
+    userEvent.click(screen.getByTestId('button-filter'));
+
+    expect(await screen.findByText(/rotation_period igual a 24/i)).toBeInTheDocument();
+
+    planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(2);
+
+    const buttons = await screen.findAllByTestId('button-remove-filter');
+    userEvent.click(buttons[1]);
+
+    planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(5);
+
+    userEvent.click(await screen.findByTestId('button-remove-filter'));
+
+    planets = await screen.findAllByTestId(/planet-name/i);
+    expect(planets.length).toEqual(10);
+  });
 })
